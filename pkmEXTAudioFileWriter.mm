@@ -2,7 +2,11 @@
 #include <libgen.h>
 #include <Accelerate/Accelerate.h>
 
-bool pkmEXTAudioFileWriter::open(string mPath, int frameSize)
+#ifndef MIN
+#define MIN(x,y) ((x) < (y)) ? (x) : (y)
+#endif
+
+bool pkmEXTAudioFileWriter::open(string mPath, int frameSize, int sampleRate)
 {
 	bReady = false;
     this->frameSize = frameSize;
@@ -12,7 +16,7 @@ bool pkmEXTAudioFileWriter::open(string mPath, int frameSize)
 															mPath.size(), 
 															false);
 
-	mFormat.mSampleRate         = 44100.00;
+	mFormat.mSampleRate         = sampleRate;
 	mFormat.mFormatID           = kAudioFormatLinearPCM;
 	mFormat.mFormatFlags        = kAudioFormatFlagIsPacked | kAudioFormatFlagIsSignedInteger; //kAudioFormatFlagsNativeFloatPacked;
 	mFormat.mFramesPerPacket    = 1;
@@ -63,10 +67,13 @@ bool pkmEXTAudioFileWriter::open(string mPath, int frameSize)
 
 void pkmEXTAudioFileWriter::close()
 {
-	bReady = false;
-	ExtAudioFileDispose(mSoundID);	
-	free(short_frame);
-	free(float_frame);
+	ExtAudioFileDispose(mSoundID);
+    if(bReady)
+    {
+        free(short_frame);
+        free(float_frame);
+        bReady = false;
+    }
 }	
 
 void pkmEXTAudioFileWriter::write(float *frame, long start, long count)

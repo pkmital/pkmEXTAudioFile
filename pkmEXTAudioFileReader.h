@@ -11,7 +11,7 @@ class pkmEXTAudioFileReader
 		pkmEXTAudioFileReader();
 		~pkmEXTAudioFileReader();
 
-		bool open(string path);
+		bool open(string path, int sampleRate = 44100);
 		bool read(float *target, long start, long count, int sampleRate = 44100);
 		void close();
 	

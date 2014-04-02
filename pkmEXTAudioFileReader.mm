@@ -8,9 +8,10 @@ pkmEXTAudioFileReader::pkmEXTAudioFileReader() : mSoundID(NULL)
 
 pkmEXTAudioFileReader::~pkmEXTAudioFileReader()
 {
+    close();
 }
 
-bool pkmEXTAudioFileReader::open(string mPath)
+bool pkmEXTAudioFileReader::open(string mPath, int sampleRate)
 {
 	OSStatus err = noErr;
 	const char *filename = basename((char *) mPath.c_str());
@@ -57,10 +58,10 @@ bool pkmEXTAudioFileReader::open(string mPath)
 	
 	mFrameRate = (unsigned) format.mSampleRate;
 	mNumChannels = (unsigned) format.mChannelsPerFrame;
-	mNumSamples = (unsigned) fileSize * (44100.0 / format.mSampleRate);
+	mNumSamples = (unsigned) fileSize * (sampleRate / format.mSampleRate);
 	mBytesPerSample = (unsigned) format.mBitsPerChannel / 8;
 	
-	//printf("[pkmEXTAudioFileReader]: opened %s (%d hz, %d ch, %d samples, %d bps)\n", mPath.c_str(), mFrameRate, mNumChannels, mNumSamples, mBytesPerSample*8);
+	printf("[pkmEXTAudioFileReader]: opened %s (%d hz, %d ch, %d samples, %d bps)\n", mPath.c_str(), mFrameRate, mNumChannels, mNumSamples, mBytesPerSample*8);
 	
 	memset(&dstFormat, 0, sizeof(AudioStreamBasicDescription));
 	UInt32 propSize;
@@ -71,7 +72,7 @@ bool pkmEXTAudioFileReader::open(string mPath)
 							&propSize, 
 							&dstFormat);
 	
-	dstFormat.mSampleRate			= 44100.0;
+	dstFormat.mSampleRate			= sampleRate;
 	dstFormat.mFormatID				= kAudioFormatLinearPCM;
 	dstFormat.mBitsPerChannel		= sizeof(float) * 8;
 	dstFormat.mChannelsPerFrame		= 1; // set this to 2 for stereo

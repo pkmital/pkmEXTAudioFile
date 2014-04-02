@@ -8,10 +8,10 @@ using namespace std;
 class pkmEXTAudioFileWriter
 {
 public:
-	pkmEXTAudioFileWriter			() {}
+	pkmEXTAudioFileWriter			() {bReady = false;}
 	~pkmEXTAudioFileWriter			() {}
 	
-	bool	open					(string path, int frameSize = 512);
+	bool	open					(string path, int frameSize = 512, int sampleRate = 44100);
 	void	write					(float *target, long start, long count);
 	void	close					();
 	
